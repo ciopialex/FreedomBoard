@@ -1,0 +1,69 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\02_UPT_WORK\\01_Embedded\\C#\\CommRecorder\\CommRecorder\\CommRecorder.csproj": {}
+  },
+  "projects": {
+    "D:\\02_UPT_WORK\\01_Embedded\\C#\\CommRecorder\\CommRecorder\\CommRecorder.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\02_UPT_WORK\\01_Embedded\\C#\\CommRecorder\\CommRecorder\\CommRecorder.csproj",
+        "projectName": "CommRecorder",
+        "projectPath": "D:\\02_UPT_WORK\\01_Embedded\\C#\\CommRecorder\\CommRecorder\\CommRecorder.csproj",
+        "packagesPath": "C:\\Users\\cseic\\.nuget\\packages\\",
+        "outputPath": "D:\\02_UPT_WORK\\01_Embedded\\C#\\CommRecorder\\CommRecorder\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\cseic\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "dependencies": {
+            "System.IO.Ports": {
+              "target": "Package",
+              "version": "[4.7.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WindowsForms": {
+              "privateAssets": "none"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.302\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

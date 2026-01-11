@@ -1,0 +1,63 @@
+Here is an explanation of the changes made to the 3D visualization:
+
+### 1. Increased Cube Opacity
+
+*   **Why:** The cube was quite transparent, making it difficult to see against the grid. Increasing its opacity makes it more solid and visually present.
+*   **Change:** In `visualization.js`, the `opacity` property of the `cubeMaterial` was changed from `0.6` to `0.75`.
+
+    ```javascript
+    // From
+    opacity: 0.6
+    
+    // To
+    opacity: 0.75 
+    ```
+
+### 2. Centered the Cube
+
+*   **Why:** The cube appeared high up on the screen because the camera was looking down on it slightly. Moving the camera to be level with the cube centers it in the view.
+*   **Change:** In `visualization.js`, the camera's initial Y-position was changed from `5` to `0`.
+
+    ```javascript
+    // From
+    camera.position.set(0, 5, 15);
+
+    // To
+    camera.position.set(0, 0, 15);
+    ```
+
+### 3. Elongated and Improved Axes
+
+*   **Why:** The original axes were the same length as the cube's sides, and they were simple cylinders. To make them clearer visual guides, they were made longer and given arrowheads.
+*   **Change:** In `visualization.js`:
+    *   The `axisLength` was increased from `7` to `10`.
+    *   The `THREE.Mesh` objects with `CylinderGeometry` were replaced with `THREE.ArrowHelper` objects, which automatically create lines with arrowheads.
+
+    ```javascript
+    // From (example for X-axis)
+    const xAxis = new THREE.Mesh(
+        new THREE.CylinderGeometry(axisRadius, axisRadius, axisLength, 8),
+        new THREE.MeshBasicMaterial({ color: 0xff004d })
+    );
+    xAxis.rotateZ(Math.PI / 2);
+
+    // To (example for X-axis)
+    const xAxis = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(-axisLength / 2, 0, 0), axisLength, 0xff004d, 1, 0.5);
+    ```
+
+### 4. Added Axis Labels (X, Y, Z)
+
+*   **Why:** To make it absolutely clear which axis is which, text labels "X", "Y", and "Z" were added to the tips of the new arrow helpers. This is essential for giving further instructions about rotation or movement.
+*   **Change:** A new function, `createAxisLabel`, was added to `visualization.js`. This function uses a `<canvas>` element to draw the text and then applies that canvas as a texture to a `THREE.Sprite`. Sprites are simple 2D images that always face the camera, making them perfect for labels. These sprites were then added to the cube.
+
+    ```javascript
+    // New function to create labels
+    function createAxisLabel(text, color, position) {
+        // ... (creates a text sprite) ...
+    }
+
+    // Creating and adding the labels
+    const xLabel = createAxisLabel('X', '#ff004d', new THREE.Vector3(axisLength / 2 + 1, 0, 0));
+    cube.add(xLabel);
+    // ... (similar for Y and Z) ...
+    ```

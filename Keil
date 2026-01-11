@@ -1,0 +1,2 @@
+#!/bin/bash
+WINEPREFIX="/home/shennyonthebeat/Keil/keil_wine_env" wine 'C:/users/shennyonthebeat/AppData/Local/Keil_v5/UV4/UV4.exe'

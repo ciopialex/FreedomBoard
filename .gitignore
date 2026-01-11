@@ -1,0 +1,45 @@
+# Environment & Large Tools
+keil_wine_env/
+*.exe
+*.pack
+*.SDA
+mdk_541.exe
+PEDrivers_install.exe
+
+# Build Artifacts (General)
+BUILD/
+cmake_build/
+*.o
+*.obj
+*.d
+*.dep
+*.map
+*.hex
+*.axf
+*.elf
+
+# Mbed OS (Library folder is heavy, we keep mbed-os.lib for versioning)
+GyroscopeProject/mbed-os/
+
+# C# Project Artifacts (CommRecorder)
+CommRecorder/.vs/
+CommRecorder/bin/
+CommRecorder/obj/
+CommRecorderExe/
+
+# School Materials (Privacy/Copyright)
+Lab*.pdf
+KL25P80M48SF0RM.pdf
+Project_proposals.pdf
+
+# Python/Virtual Envs
+__pycache__/
+*.pyc
+venv/
+.gemini/
+
+# Keep the specific binaries we want, ignore others if generated
+# (The patterns above shouldn't hide these, but just in case)
+!GyroscopeProject/StepCounter.bin
+!GyroscopeProject/XYZ_Terminal.bin
+!GyroscopeProject/PitchRoll_Visualization.bin

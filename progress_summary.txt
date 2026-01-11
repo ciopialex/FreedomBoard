@@ -1,0 +1,74 @@
+## Keil MDK Installation Progress on Ubuntu
+
+**Date:** October 22, 2025
+
+**Initial Goal:** Install Keil MDK on Ubuntu 24.04 to develop a step counter for an NXP board using Keil's simulation features.
+
+**Key Decisions & Actions:**
+
+1.  **Identified Keil MDK as Windows-only:** Confirmed that Keil MDK 5 requires a Windows environment.
+2.  **Selected Wine for Installation:** Decided to use Wine as a compatibility layer, specifically for simulation purposes, addressing concerns about system stability.
+3.  **Isolated Wine Environment:** Created a dedicated Wine prefix at `/home/shennyonthebeat/Keil/keil_wine_env` to keep the Keil installation isolated from the main system.
+4.  **Wine Installation & Configuration:**
+    *   Installed Wine on Ubuntu.
+    *   Ensured 32-bit Wine components (`wine32`) were correctly installed, which was crucial for Keil MDK.
+    *   Initialized the isolated Wine environment.
+5.  **Keil MDK Installation:**
+    *   Successfully ran `mdk_541.exe` within the isolated Wine environment.
+    *   Keil MDK 5 was installed to its default location within the Wine prefix.
+6.  **Device Family Pack (DFP) Installation:**
+    *   Successfully installed `Keil.Kinetis_KLxx_DFP.1.15.1.pack` for NXP Kinetis microcontrollers.
+7.  **Keil µVision Launch Confirmed:** Verified that the Keil µVision IDE launches and runs correctly.
+8.  **Custom Launch Executable:** Created a simple executable file named `Keil` in `/home/shennyonthebeat/Keil` to easily launch µVision from the terminal (`cd ~/Keil && ./Keil`).
+
+**Additional Files & Information:**
+
+*   **User-provided files:** `added_files.png`, `KL25P80M48SF0RM.pdf`, `MSD-DEBUG-FRDM-KL25Z_Pemicro_v118.SDA`, `PEDrivers_install.exe`.
+*   **PDF Analysis:** Confirmed `KL25P80M48SF0RM.pdf` is the NXP KL25 Sub-Family Reference Manual, a critical document for development.
+*   **PEmicro Explained:** Provided a description of PEmicro as a developer of embedded systems tools, relevant to the provided driver installer.
+
+**Current Status:** Keil MDK 5 is successfully installed and launching on Ubuntu via Wine, ready for project development and simulation.
+
+---
+
+## Learning and Project Plan: Step Recognition and Counting
+
+**Project Goal:** Implement a step recognition and counting system using the FRDM-KL25Z board and MMA8451 accelerometer, while learning embedded systems and assembly programming from scratch.
+
+**Phase 1: Foundation and Basic Peripherals (Focus: C with Assembly Introduction)**
+*   **Objective:** Get the FRDM-KL25Z board operational, understand basic peripheral control, and establish communication.
+*   **Key Learning:** Toolchain setup, GPIO, Timers, I2C, UART, basic assembly.
+*   **Tasks:**
+    1.  **Toolchain Setup:** Install and configure Keil uVision IDE.
+    2.  **LED Blinking (C & Assembly):**
+        *   Write a C program to blink an LED.
+        *   Rewrite the LED blinking routine in assembly to understand direct register manipulation.
+    3.  **Timer Interrupts (C):** Configure a Periodic Interrupt Timer (PIT) in C to trigger an interrupt at a fixed interval.
+    4.  **I2C & Accelerometer (C):** Implement I2C communication in C to read raw data from the MMA8451 accelerometer.
+    5.  **UART Communication (C):** Configure UART in C to send the raw accelerometer data to a terminal on your computer.
+
+**Phase 2: Data Processing and Algorithm Development (Focus: C)**
+*   **Objective:** Process the accelerometer data to detect steps.
+*   **Key Learning:** Data calibration, digital filtering, algorithm development.
+*   **Tasks:**
+    1.  **Continuous Data Acquisition:** Read accelerometer data (X, Y, Z axes) at regular intervals using the PIT.
+    2.  **Calibration:** Implement a calibration routine for the accelerometer to remove bias.
+    3.  **Filtering:** Implement a simple digital filter (e.g., moving average) to reduce noise in the accelerometer data.
+    4.  **Step Detection Algorithm:** Develop and implement a step detection algorithm based on the filtered data (e.g., thresholding, peak detection).
+    5.  **Step Counting:** Increment a counter each time a step is detected.
+
+**Phase 3: Integration, Refinement, and Assembly Optimization (Focus: C & Assembly)**
+*   **Objective:** Integrate all components, refine the step counter, and optimize critical sections using assembly.
+*   **Key Learning:** System integration, performance optimization, advanced assembly.
+*   **Tasks:**
+    1.  **Integrate:** Combine data acquisition, processing, and counting into a single application.
+    2.  **Display Step Count:** Transmit the step count to the computer via UART.
+    3.  **Testing and Tuning:** Test the step counter and tune algorithm parameters for accuracy.
+    4.  **Assembly Optimization (Advanced):** Identify performance-critical sections of your C code and rewrite them in assembly to improve performance.
+
+**Phase 4: Documentation and Presentation**
+*   **Objective:** Document your project and present your findings.
+*   **Tasks:**
+    1.  **Code Documentation:** Thoroughly comment your code.
+    2.  **Project Report:** Write a report detailing your approach, challenges, solutions, and results.
+    3.  **Demonstration:** Prepare a demonstration of your step counter.

@@ -1,0 +1,313 @@
+# Project Explanation Log
+
+## 2025-11-19 - Initializing Project Log & Smoothing Sensor Data
+
+### Where We Started: The Problem of "Noisy" Data
+
+When we first got the accelerometer running, we noticed that even when the board was perfectly still, the numbers it produced were jumping around a lot.
+
+**Think of it like this:** Imagine you're trying to measure the exact height of a person, but your measuring tape is made of a slightly stretchy material. Every time you measure, you get a slightly different number (e.g., 175.1cm, 174.9cm, 175.2cm). This is "noise" - small, random errors in the measurement. Our accelerometer has the same problem.
+
+The goal is to get a more stable, trustworthy number when the board is still. This process is called **filtering**.
+
+### What We're Doing: The "Simple Moving Average" (SMA) Filter
+
+We are implementing a very common and easy-to-understand filter called a **Simple Moving Average**.
+
+**The concept is simple:** Instead of trusting the very last measurement, we're going to take the last 10 measurements, add them all up, and then divide by 10 to find the average. This "average" value is our new, filtered measurement.
+
+By doing this, any single weird or "noisy" reading gets balanced out by the other nine more normal readings. This gives us a much smoother and more stable output.
+
+### How We're Implementing It in Code
+
+We're going to add a few things to our `main.cpp` file.
+
+1.  **Create "History Books" for Our Measurements:**
+    We need a place to store the last 10 measurements for each axis (X, Y, and Z). We'll use arrays for this, which are like numbered lists.
+
+    ```cpp
+    // --- Simple Moving Average (SMA) Filter ---
+    const int FILTER_WINDOW_SIZE = 10; // How many measurements to average
+    static int12_t x_buffer[FILTER_WINDOW_SIZE];
+    static int12_t y_buffer[FILTER_WINDOW_SIZE];
+    static int12_t z_buffer[FILTER_WINDOW_SIZE];
+    static int avg_index = 0; // A counter to know where to save the next measurement
+    ```
+    We made these `static` so they don't get reset every time the loop runs, and `const int` for the size because that number won't change.
+
+2.  **Update the History with Each New Reading:**
+    Inside our main loop, every time we get a new reading from the sensor, we'll add it to our history arrays. We use `avg_index` to keep track of where to put the new number. Once we hit the end of the list (index 9), we "wrap around" and start overwriting the oldest values from the beginning. This is called a **circular buffer**.
+
+    ```cpp
+    // Add new values to the circular buffers
+    x_buffer[avg_index] = x; // x is the raw data from the sensor
+    y_buffer[avg_index] = y;
+    z_buffer[avg_index] = z;
+
+    // Increment index and wrap around
+    avg_index = (avg_index + 1) % FILTER_WINDOW_SIZE; // The % (modulo) operator does the wrapping around
+    ```
+
+3.  **Calculate the Average:**
+    After we've stored the new value, we'll loop through our entire history for each axis, add up all the numbers, and divide by our window size (10).
+
+    ```cpp
+    // Calculate the average
+    int32_t x_sum = 0, y_sum = 0, z_sum = 0;
+    for (int i = 0; i < FILTER_WINDOW_SIZE; i++) {
+        x_sum += x_buffer[i];
+        y_sum += y_buffer[i];
+        z_sum += z_buffer[i];
+    }
+    int16_t x_avg = x_sum / FILTER_WINDOW_SIZE;
+    int16_t y_avg = y_sum / FILTER_WINDOW_SIZE;
+    int16_t z_avg = z_sum / FILTER_WINDOW_SIZE;
+    ```
+
+4.  **Print the Stable Value:**
+    Finally, instead of printing the raw `x`, `y`, and `z`, we'll print our new, much smoother, averaged values!
+
+    ```cpp
+    // OLD line:
+    // printf("X:%d,Y:%d,Z:%d\r\n", x_avg, y_avg, z_avg);
+
+    // NEW line:
+    printf("X:%d,Y:%d,Z:%d\r\n", x_avg, y_avg, z_avg);
+    ```
+
+This change will make our accelerometer output much more stable and reliable, which is the first step towards getting useful data for calculating things like pitch and roll.
+
+---
+
+## 2025-11-19 - Verification of Simple Moving Average Filter
+
+### What We Did:
+
+We modified the `main.cpp` file to include the Simple Moving Average (SMA) filter. This involved:
+1.  Adding buffers (arrays) to store the last 10 readings for X, Y, and Z axes.
+2.  Implementing logic to update these buffers with new readings in a circular fashion.
+3.  Calculating the average of the values in these buffers.
+4.  Printing these averaged values to the serial port instead of the raw, noisy readings.
+
+### Observed Results:
+
+After compiling the updated code and flashing it to the FRDM-KL25Z board, the serial output for the accelerometer data (X, Y, Z) became significantly more stable.
+
+**Before Filter:** The readings were "oscillating too much" even when the board was stationary.
+
+**After Filter:** With the board flat on the table, the readings showed much tighter ranges:
+*   X-axis: between 20 and 80
+*   Y-axis: between 190 and 240
+*   Z-axis: between 16260 and 16330
+
+This confirms that the SMA filter successfully reduced the noise in the accelerometer data, providing a more reliable input for future calculations.
+
+---
+
+## 2025-11-19 - Clarifying the "Gyroscope" Project & Our Path Forward
+
+### The Confusion: "Gyroscope" Project without a Gyroscope
+
+We correctly identified that the project proposal lists a "Gyroscope" project, but our hardware (the MMA8451Q sensor) is only an accelerometer. This seemed like a contradiction.
+
+### The Resolution: What the Project *Actually* Asks For
+
+After carefully reviewing the "Gyroscope" project milestones in the `Project_proposals.pdf`, we found the answer. The project uses the title "Gyroscope" as a shorthand for an orientation-sensing project.
+
+The detailed milestones reveal the true goal:
+*   One of the first steps is to "**Read accelerometer**".
+*   The main implementation task is to "**Calculate board position in pitch and roll**".
+
+This means the project *expects* us to determine the board's orientation (its pitch and roll) using the accelerometer data alone. We are not expected to have a physical gyroscope. The project name is a bit misleading, but the requirements are clear.
+
+### This is Good News!
+
+This means our current plan is perfectly aligned with the project goals. We do not need any new hardware. We can proceed with the following steps using only the accelerometer we have:
+
+1.  **Calculate Pitch and Roll:** We will add code to `main.cpp` to convert the X, Y, and Z accelerometer values into pitch and roll angles.
+2.  **Visualize the Orientation:** We will create a simple web page using `three.js` that shows a 3D model of our board and makes it rotate in real-time based on the calculated pitch and roll.
+
+We are on the right track, and our next step is to start building the `three.js` visualization page.
+
+---
+
+## 2025-11-19 - Current Stopping Point (User Shutdown)
+
+### Where We Left Off:
+
+We have successfully implemented the Simple Moving Average filter in the firmware, and verified that the accelerometer data streaming over serial is now much more stable. We also clarified that the "Gyroscope" project in your proposal can be achieved using the accelerometer data to calculate pitch and roll, without needing a separate gyroscope sensor.
+
+### Next Steps We Were About to Take:
+
+We had just begun setting up the web-based 3D visualization. We created the following files in the `3D_Visualization` directory:
+*   `index.html`: The main HTML page for the visualization.
+*   `main.js`: Contains the initial `three.js` code to set up a basic 3D scene with a rotating box.
+
+The immediate next step was to create a simple Python web server (`server.py`) to serve these files on `localhost`, allowing you to view the basic 3D scene in your browser. We paused before creating `server.py` to confirm your preferred port number, as you indicated port 8000 was not suitable.
+
+When you're ready to resume, we can create the `server.py` file with your chosen port, and then move on to connecting the serial data to the web visualization and making the 3D model respond to the accelerometer's pitch and roll.
+
+---
+
+## 2025-11-20 - Upgrading the Firmware for a Professional Visualization
+
+Today we made two critical upgrades to the firmware to support the vision of a smooth, professional, real-time 3D visualization.
+
+### Change 1: Increasing the Data Rate for 60fps Smoothness
+
+#### The "Why"
+You wanted the 3D animation to be "very smooth, more than 60fps." A high frame rate on the screen is only possible if we get data from the board fast enough to keep up. Our old code had a 100-millisecond (ms) delay, which means we were only getting 10 updates per second (1000ms / 100ms = 10). This is a too slow and would look choppy.
+
+To get a 60 frames per second (fps) feeling, we need data at least 30-60 times per second. We changed the delay to **30ms**. This gives us about 33 data updates per second (1000ms / 30ms ≈ 33), which is a huge improvement and will make the rotation of our 3D object feel fluid and responsive.
+
+#### The Code Change
+In `main.cpp`, we found this line at the end of the `while(1)` loop:
+```cpp
+// OLD line:
+ThisThread::sleep_for(chrono::milliseconds(100));
+```
+And we changed it to be more than three times faster:
+```cpp
+// NEW line:
+ThisThread::sleep_for(chrono::milliseconds(30));
+```
+This simple change is the foundation for the high-quality experience we're building.
+
+### Change 2: Calculating Pitch & Roll (The Virtual Gyroscope)
+
+#### The "Why"
+The accelerometer gives us raw force data on the X, Y, and Z axes. To a computer, this is just a bunch of numbers. To create a virtual gyroscope, we need to turn those numbers into something meaningful, like **angles**. These angles are what we call "pitch" and "roll."
+
+*   **Pitch:** Imagine an airplane. When it noses up or down, that's its pitch. For our board, this is the tilt forward and backward.
+*   **Roll:** When the airplane tilts its wings left or right, that's its roll. This is the side-to-side tilt of our board.
+
+By calculating these two angles, we can know the board's orientation in 3D space.
+
+#### The Code Change
+We used some math to do this conversion. Specifically, a function called `atan2`. This function is great for getting an angle from X and Y coordinates. We can use our accelerometer axes in a similar way.
+
+1.  **Include the Math Library:** First, we needed to tell our program we wanted to use advanced math functions, so we added `#include <cmath>`.
+
+2.  **Calculate the Angles:** After we get our stable, averaged `x_avg`, `y_avg`, and `z_avg` values, we added these lines:
+    ```cpp
+    // Calculate Pitch and Roll from filtered data (in radians)
+    pitch = atan2(y_avg, z_avg); // Rotation around X-axis
+    roll = atan2(x_avg, z_avg);  // Rotation around Y-axis
+    ```
+    We use the `z_avg` (the force of gravity) as our stable "down" reference to calculate the tilt on the other two axes. The result is given in **radians**, which is a standard unit for angles in programming that `three.js` understands perfectly.
+
+3.  **Send the New Data:** Finally, we changed what we send over the serial port. Instead of the raw X, Y, Z numbers, we now send the useful angles.
+    ```cpp
+    // OLD line:
+    // printf("X:%d,Y:%d,Z:%d\r\n", x_avg, y_avg, z_avg);
+
+    // NEW line:
+    printf("PITCH:%.2f,ROLL:%.2f\r\n", pitch, roll);
+    ```
+    This sends the data in a clean, easy-to-read format that our Python server will be able to understand and pass along to the 3D visualization.
+
+### Setting Up and Running the Real-Time Visualization
+
+Now that all the pieces are in place – the fast-updating firmware, the Python backend server, and the cyberpunk-themed 3D frontend – it's time to bring it all to life!
+
+#### Step 1: Install Python Libraries (if you haven't already)
+The Python server needs two special libraries to work: `websockets` (for talking to your browser) and `pyserial` (for talking to your board). We installed them into your `mbed-cli-env` virtual environment. If for some reason they aren't installed, you can do it like this:
+```bash
+/home/shennyonthebeat/mbed-cli-env/bin/pip install websockets pyserial
+```
+
+#### Step 2: Ensure Your Board is Ready
+*   Make sure your FRDM-KL25Z board is connected to your computer and has the *latest firmware* flashed (the one with pitch/roll calculations and 30ms update rate).
+
+#### Step 3: Start the Python Backend Server
+This server acts as the bridge between your board's serial data and your web browser.
+*   Open a new terminal window.
+*   First, change your directory to where the server file is located:
+    ```bash
+    cd /home/shennyonthebeat/Keil/3D_Visualization
+    ```
+*   Then, run the Python server using the Python from your virtual environment:
+    ```bash
+    /home/shennyonthebeat/mbed-cli-env/bin/python server.py
+    ```
+    You should see messages in this terminal indicating that the HTTP server and WebSocket server have started (e.g., "HTTP server started at http://localhost:8888" and "WebSocket server started on ws://localhost:8889"). Keep this terminal window open.
+
+#### Step 4: View the 3D Visualization in Your Browser
+*   Open your favorite web browser (like Chrome, Firefox, Edge).
+*   Go to this exact address:
+    ```
+    http://localhost:8888
+    ```
+*   You should now see the 3D visualization! Try tilting your FRDM-KL25Z board in your hand, and watch the 3D model on your screen rotate in real-time, matching your board's movements.
+
+Enjoy your cyberpunk real-time gyroscope visualization!
+
+---
+## Complete Setup & Run Instructions from Scratch
+
+This is the complete sequence of commands to get everything running from a fresh terminal, assuming you are starting in your home directory (`~`).
+
+### Step 1: Flash the Latest Firmware
+*   Make sure your FRDM-KL25Z board is connected and mounted as a USB drive.
+*   Copy the latest firmware file (which includes the 30ms update rate and pitch/roll calculations) to your board.
+    ```bash
+    cp /home/shennyonthebeat/Keil/GyroscopeProject/cmake_build/KL25Z/develop/GCC_ARM/GyroscopeProject.bin /media/shennyonthebeat/FRDM-KL25Z/
+    ```
+*   Wait for the board's LED to stop flashing before proceeding. This indicates the firmware has been successfully transferred.
+
+### Step 2: Install Python Dependencies
+*   This step ensures the necessary Python libraries (`websockets` and `pyserial`) are installed in your project's virtual environment. You only need to do this once.
+    ```bash
+    /home/shennyonthebeat/mbed-cli-env/bin/pip install websockets pyserial
+    ```
+*   If the libraries are already installed, the command will simply confirm this by saying "Requirement already satisfied".
+
+### Step 3: Run the Backend Server & View the Visualization
+*   Open a new terminal.
+*   Navigate to the correct directory containing the server and web files:
+    ```bash
+    cd /home/shennyonthebeat/Keil/3D_Visualization
+    ```
+*   Run the Python backend server using the virtual environment's specific Python interpreter:
+    ```bash
+    /home/shennyonthebeat/mbed-cli-env/bin/python server.py
+    ```
+*   Keep this terminal open! It is now your running server.
+*   Open your web browser (e.g., Chrome, Firefox) and go to this address:
+    ```
+    http://localhost:8888
+    ```
+*   You should see the 3D visualization. Tilt your board and watch the 3D model rotate in real-time!
+
+---
+## 2025-11-20 - The "Could not convert string to float" Bug Fix
+
+You found a fantastic bug! When we ran the server, we saw the error: `could not convert string to float: '%.2f'`. This pointed to a problem not in the Python code, but in the C++ firmware on the board.
+
+### The "Why": Different Versions of `printf`
+In the world of embedded systems (like our NXP board), memory is extremely limited. To save space, the Mbed OS uses a "minimal" version of the `printf` command by default. This minimal version is lightweight, but it doesn't know how to handle floating-point numbers (numbers with decimals).
+
+So, when our C++ code tried to print the pitch and roll floats using `printf("PITCH:%.2f,ROLL:%.2f\r\n", pitch, roll);`, the minimal `printf` didn't understand what to do with `%.2f`. Instead of replacing it with the number, it just printed the literal text "%.2f".
+
+The Python server then received the string `"PITCH:%.2f,ROLL:%.2f"` and correctly failed when it tried to convert the text `%.2f` into a number, giving us the error.
+
+### The "How": Enabling the Full `printf`
+To fix this, we needed to tell our project to stop using the minimal `printf` and start using the "standard" `printf` that knows all about floats. We did this by editing the Mbed project's configuration file, `mbed_app.json`.
+
+This file lets us override the default settings for our project. We added a configuration that applies to all targets (`"*")` and tells the compiler to use the standard C library for printing.
+
+#### The Code Change
+In the file `GyroscopeProject/mbed_app.json`, we added the `"target.printf_lib": "std"` setting:
+```json
+{
+    "target_overrides": {
+        "*": {
+            "target.printf_lib": "std"
+        },
+        "K64F": {
+            "platform.stdio-baud-rate": 9600
+        }
+    }
+}
+```
+With this change, the next time we compile the firmware, it will be built with the full, float-capable `printf`. This will make it correctly format the pitch and roll numbers into the string, which the Python server will then be able to parse perfectly. This is a great example of how software and hardware configurations interact in embedded systems development!
