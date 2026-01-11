@@ -99,8 +99,8 @@ const cubeMaterial = new THREE.MeshStandardMaterial({
 });
 const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
-// THIS IS THE FIX for the initial orientation.
-// We rotate the cube 90 degrees on the X-axis so it starts "lying flat" on the grid.
+// --- Initial Orientation Adjustment ---
+// Rotate the cube 90 degrees on the X-axis so it aligns with the grid's "flat" plane
 cube.rotation.x = -Math.PI / 2;
 
 // Add the cube to the pivot group instead of the scene directly

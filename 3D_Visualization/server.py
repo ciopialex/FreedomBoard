@@ -79,8 +79,8 @@ def read_from_serial():
             logging.warning("Serial disconnected. Retrying in 2s...")
             time.sleep(2)
 
-# --- THE FIX IS HERE ---
-# Using *args makes this compatible with ALL versions of the websockets library
+# --- WebSocket Handler Wrapper ---
+# Using *args allows compatibility with different versions of the websockets library
 async def websocket_handler(websocket, *args):
     logging.info(f"Client connected from {websocket.remote_address}")
     connected_clients.add(websocket)
