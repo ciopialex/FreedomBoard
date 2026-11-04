@@ -1,3 +1,10 @@
+<p align="left">
+  <img src="https://img.shields.io/badge/Hardware-NXP_FRDM--KL25Z-blue.svg?style=for-the-badge" alt="Hardware" />
+  <img src="https://img.shields.io/badge/Sensor-MMA8451Q_Accelerometer-green.svg?style=for-the-badge" alt="Sensor" />
+  <img src="https://img.shields.io/badge/Architecture-ARM_Cortex--M0%2B-orange.svg?style=for-the-badge" alt="Arch" />
+  <img src="https://img.shields.io/badge/Output-Step_Counter%20%2B%20Motion_GUI-purple.svg?style=for-the-badge" alt="Output" />
+</p>
+
 # FRDM-KL25Z Motion Sensor & Visualization Project
 
 This repository contains the source code and firmware for a motion sensing project using the NXP FRDM-KL25Z board (MMA8451Q Accelerometer).
